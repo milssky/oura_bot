@@ -1,0 +1,50 @@
+[project]
+name = "oura-bot"
+version = "0.1.0"
+description = "Oura user monitorng TG bot"
+requires-python = ">=3.13"
+dependencies = [
+    "apscheduler>=3.11.0",
+    "httpx>=0.28.1",
+    "pydantic>=2.10.6",
+    "python-telegram-bot>=21.11.1",
+]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.9.10",
+]
+
+[tool.ruff]
+target-version = "py312"
+fix = true
+preview = true
+unsafe-fixes = true
+line-length = 100
+lint.select = [
+    "ANN",
+    "RET",
+    "DJ006", "DJ008", "DJ012", "DJ013",
+    "E4", "E7", "E9", "F", "I", "T20",
+    "D101", "D103",
+    "D200", "D201", "D203", "D204", "D205", "D206", "D207", "D208", "D209",
+    "D301", "D403",
+    "D400", "D401", "D402", "D404", "D415",
+    "RUF022", "RUF023",
+    "PTH",
+    "RSE102",
+    "ISC",
+    "N",
+]
+lint.ignore = [
+    "D1", "D203", "D213", "D205",
+    "ANN401", "ANN101", "ANN102", "RUF001", "ARG002", "ARG001",
+    "RUF012", "SLF001", "RUF002", "RUF003",
+    "PTH123",
+]
+
+[tool.ruff.format]
+quote-style = "single"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
