@@ -10,6 +10,7 @@ dependencies = [
     "pydantic>=2.10.6",
     "python-telegram-bot>=21.11.1",
     "stamina>=24.3.0",
+    "tortoise-orm>=0.24.2",
 ]
 
 [dependency-groups]
@@ -54,3 +55,4 @@ line-ending = "auto"
 
 [tool.ruff.lint.extend-per-file-ignores]
 "oura_bot/dtos.py" = ["D"]
+"oura_bot/models.py" = ["D"]

@@ -1,37 +1,42 @@
-import asyncio
-import os
+import logging
 from typing import Coroutine
 
 from telegram import Bot
 
-from oura_bot.provider import container
 from oura_bot.client import OuraClient
+from oura_bot.models import ReadinessMeasure, SleepMeasure, User
+from oura_bot.provider import container
 from oura_bot.repository import OuraRepository
 from oura_bot.utils import load_users
 
-
-def collect_sleep_tasks(repository: OuraRepository, clients: list[OuraClient]) -> list[Coroutine]:
-    """Generate sleep api call tasks list."""
-    return [repository.get_total_sleep(client) for client in clients]
+logging.basicConfig(level=logging.INFO)
 
 
-def collect_readiness_tasks(
-    repository: OuraRepository, clients: list[OuraClient]
-) -> list[Coroutine]:
-    """Generate readiness api call tasks list."""
-    return [repository.get_daily_readiness(client) for client in clients]
+async def get_and_save_measures_by_user(
+    username: str, repository: OuraRepository, client: OuraClient
+) -> Coroutine | None:
+    """Save to DB user measurements."""
+    logging.info(f'Pulling data for {username}')
+    user, _ = await User.get_or_create(name=username)
+    readiness = await repository.get_daily_readiness(client)
+    sleep = await repository.get_total_sleep(client)
+
+    if readiness is None or sleep is None:
+        return None  # TODO: new pull task
+    readiness = readiness.contributors.model_dump(exclude={'id'})
+    sleep = sleep.contributors.model_dump(exclude={'id'})
+
+    await ReadinessMeasure.create(user=user, **readiness)
+    await SleepMeasure.create(user=user, **sleep)
 
 
 async def pull_and_send_task() -> None:
     """Send pulled data to admin chat."""
-    bot = container.get(Bot)
-    clients = [OuraClient(token=user['token']) for user in load_users()]
+    logging.info('Pulling data...')
+    container.get(Bot)
     repository = OuraRepository()
-    tasks = collect_sleep_tasks(repository, clients)
-    tasks.extend(collect_readiness_tasks(repository, clients))
-    result = await asyncio.gather(*tasks)
-    for result in result:
-        if result is None:
-            pass  # TODO: запланировать новую таску
-            continue
-        await bot.send_message(chat_id=os.environ.get('ADMIN_TG_CHAT_ID'), text=str(result))
+
+    clients = [(OuraClient(token=user['token']), user['name']) for user in load_users()]
+
+    for client, username in clients:
+        await get_and_save_measures_by_user(username, repository, client)
