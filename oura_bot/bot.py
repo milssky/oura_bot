@@ -8,7 +8,4 @@ def get_bot(token: str) -> Bot:
     return Bot(token=token)
 
 
-
-bot = get_bot(
-    token=os.environ['BOT_TOKEN']
-)
+bot = get_bot(token=os.environ['BOT_TOKEN'])

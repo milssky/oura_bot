@@ -29,6 +29,7 @@ class ReadinessContributorsDTO(BaseModel):
     resting_heart_rate: int
     sleep_balance: int
 
+
 class ReadinessDTO(BaseModel):
     id: str
     contributors: ReadinessContributorsDTO | None = None

@@ -8,6 +8,7 @@ from oura_bot.urls import API_ROOT, DAILY_READINESS, TOTAL_SLEEP_URL
 
 class OuraClient(AsyncClient):
     """HTTP client to handle Oura API."""
+
     def __init__(self, token: str, *args: Any, **kwargs: dict[str, Any]) -> None:
         super().__init__(*args, **kwargs)
         self.base_url = API_ROOT

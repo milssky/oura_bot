@@ -38,7 +38,7 @@ lint.select = [
 ]
 lint.ignore = [
     "D1", "D203", "D213", "D205",
-    "ANN401", "ANN101", "ANN102", "RUF001", "ARG002", "ARG001",
+    "ANN401", "RUF001", "ARG002", "ARG001",
     "RUF012", "SLF001", "RUF002", "RUF003",
     "PTH123",
 ]
@@ -48,3 +48,6 @@ quote-style = "single"
 indent-style = "space"
 skip-magic-trailing-comma = false
 line-ending = "auto"
+
+[tool.ruff.lint.extend-per-file-ignores]
+"oura_bot/dtos.py" = ["D"]

@@ -5,6 +5,7 @@ from httpx import Auth, Request, Response
 
 class BearerAuth(Auth):
     """Bearer token auth class."""
+
     def __init__(self, *, token: str) -> None:
         self.token = token
         self._auth_header = self._build_auth_header(token=self.token)

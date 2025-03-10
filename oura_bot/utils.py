@@ -5,6 +5,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 def load_users(data_path: Path = BASE_DIR / 'users.toml') -> list[dict[str, str]]:
+    """Get user data from TOML users file."""
     with open(data_path, 'rb') as f:
         users = tomllib.load(f)
 
