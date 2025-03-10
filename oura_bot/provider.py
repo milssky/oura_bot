@@ -13,7 +13,7 @@ class ServiceProvider(Provider):
         return Bot(token=os.environ['BOT_TOKEN'])
 
     @provide(scope=Scope.APP)
-    def get_sheduler(self) -> AsyncIOScheduler:
+    def get_scheduler(self) -> AsyncIOScheduler:
         return AsyncIOScheduler()
 
 
