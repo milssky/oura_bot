@@ -21,6 +21,10 @@ class TimeStampedMixin(Model):
 
 class User(UUIDMixin, Model):
     name = fields.CharField(max_length=254)
+    timezone = fields.CharField(max_length=254)
+
+    class Meta:
+        ordering = ('name',)
 
 
 class ReadinessMeasure(UUIDMixin, TimeStampedMixin, Model):
@@ -38,6 +42,9 @@ class ReadinessMeasure(UUIDMixin, TimeStampedMixin, Model):
     resting_heart_rate = fields.IntField(null=True)
     sleep_balance = fields.IntField(null=True)
 
+    class Meta:
+        ordering = ('created_at',)
+
 
 class SleepMeasure(UUIDMixin, TimeStampedMixin, Model):
     user = ForeignKeyField(
@@ -54,3 +61,6 @@ class SleepMeasure(UUIDMixin, TimeStampedMixin, Model):
     total_sleep = fields.IntField(null=True)
     created_at = fields.DatetimeField(auto_now_add=True)
     updated_at = fields.DatetimeField(auto_now=True)
+
+    class Meta:
+        ordering = ('created_at',)
