@@ -5,9 +5,11 @@ description = "Oura user monitorng TG bot"
 requires-python = ">=3.13"
 dependencies = [
     "apscheduler>=3.11.0",
+    "dishka>=1.4.2",
     "httpx>=0.28.1",
     "pydantic>=2.10.6",
     "python-telegram-bot>=21.11.1",
+    "stamina>=24.3.0",
 ]
 
 [dependency-groups]
