@@ -4,7 +4,7 @@ from httpx import AsyncClient, HTTPError, Response
 from stamina import retry
 
 from oura_bot.auth import BearerAuth
-from oura_bot.consts import RETRY_ATTEMPTS
+from oura_bot.settings import RETRY_ATTEMPTS
 from oura_bot.urls import API_ROOT, DAILY_READINESS, TOTAL_SLEEP_URL
 
 

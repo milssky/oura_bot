@@ -4,7 +4,7 @@ from typing import Coroutine
 
 from telegram import Bot
 
-from oura_bot.bot import bot_container
+from oura_bot.provider import container
 from oura_bot.client import OuraClient
 from oura_bot.repository import OuraRepository
 from oura_bot.utils import load_users
@@ -24,7 +24,7 @@ def collect_readiness_tasks(
 
 async def pull_and_send_task() -> None:
     """Send pulled data to admin chat."""
-    bot = bot_container.get(Bot)
+    bot = container.get(Bot)
     clients = [OuraClient(token=user['token']) for user in load_users()]
     repository = OuraRepository()
     tasks = collect_sleep_tasks(repository, clients)
