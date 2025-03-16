@@ -3,15 +3,14 @@ from tortoise.fields.relational import ForeignKeyField
 from tortoise.models import Model
 
 
-class UUIDMixin(Model):
-    id = fields.UUIDField(pk=True)
+class IDMixin(Model):
+    id = fields.IntField(pk=True)
 
     class Meta:
         abstract = True
 
 
 class TimeStampedMixin(Model):
-    id = fields.UUIDField(pk=True)
     created_at = fields.DatetimeField(auto_now_add=True)
     updated_at = fields.DatetimeField(auto_now=True)
 
@@ -19,7 +18,7 @@ class TimeStampedMixin(Model):
         abstract = True
 
 
-class User(UUIDMixin, Model):
+class User(IDMixin, Model):
     name = fields.CharField(max_length=254)
     timezone = fields.CharField(max_length=254)
 
@@ -27,7 +26,7 @@ class User(UUIDMixin, Model):
         ordering = ('name',)
 
 
-class ReadinessMeasure(UUIDMixin, TimeStampedMixin, Model):
+class ReadinessMeasure(IDMixin, TimeStampedMixin, Model):
     user = ForeignKeyField(
         model_name='models.User',
         related_name='readiness_measures',
@@ -43,10 +42,10 @@ class ReadinessMeasure(UUIDMixin, TimeStampedMixin, Model):
     sleep_balance = fields.IntField(null=True)
 
     class Meta:
-        ordering = ('created_at',)
+        ordering = ('-created_at',)
 
 
-class SleepMeasure(UUIDMixin, TimeStampedMixin, Model):
+class SleepMeasure(IDMixin, TimeStampedMixin, Model):
     user = ForeignKeyField(
         model_name='models.User',
         related_name='sleep_measures',
@@ -63,4 +62,4 @@ class SleepMeasure(UUIDMixin, TimeStampedMixin, Model):
     updated_at = fields.DatetimeField(auto_now=True)
 
     class Meta:
-        ordering = ('created_at',)
+        ordering = ('-created_at',)

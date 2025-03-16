@@ -1,12 +1,11 @@
 import logging
 import os
-from datetime import date, datetime, timedelta
-from typing import Coroutine, Any
+from datetime import date, datetime
+from typing import Any, Coroutine
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 from telegram import Bot
-from tortoise.contrib.pydantic import PydanticListModel
 
 from oura_bot.client import OuraClient
 from oura_bot.models import ReadinessMeasure, SleepMeasure, User
@@ -39,28 +38,82 @@ async def get_and_save_measures_by_user(
     readiness = readiness.contributors.model_dump(exclude={'id'})
     sleep = sleep.contributors.model_dump(exclude={'id'})
 
+    await ReadinessMeasure.all().delete()
+    await SleepMeasure.all().delete()
+
     await ReadinessMeasure.create(user=user, **readiness)
     await SleepMeasure.create(user=user, **sleep)
 
 
-async def collect_data_to_send(clients: list[tuple[OuraClient, dict[str, str]]], date: date) -> dict[str, Any]:
-    from tortoise.contrib.pydantic import pydantic_model_creator, PydanticListModel
+async def collect_data_to_send(
+    clients: list[tuple[OuraClient, dict[str, str]]], date: date
+) -> dict[str, Any]:
+    """Do main task."""
+    from tortoise.contrib.pydantic import pydantic_model_creator
 
-    SleepMeasureDTO = pydantic_model_creator(SleepMeasure)
-    ReadinessMeasureDTO = pydantic_model_creator(ReadinessMeasure)
-
-    SleepOutDTO = PydanticListModel[SleepMeasureDTO]
-    ReadinessOutDTO = PydanticListModel[ReadinessMeasureDTO]
+    sleep_measure_dto = pydantic_model_creator(SleepMeasure, exclude=('user',))
+    readiness_measure_dto = pydantic_model_creator(ReadinessMeasure, exclude=('user',))
 
     data = {}
     for _, user in clients:
         data[user['name']] = dict()
-        sleep_out = SleepMeasure.filter(user__name=user['name']).prefetch_related('user')
-        readiness_out = ReadinessMeasure.filter(user=user['name']).prefetch_related('user')
-        data[user['name']]['sleep'] = await SleepOutDTO.from_queryset(sleep_out)
-        data[user['name']]['readiness'] = await ReadinessOutDTO.from_queryset(readiness_out)
-
+        sleep_out = [
+            (await sleep_measure_dto.from_tortoise_orm(sleep)).model_dump(
+                exclude={
+                    'id',
+                    'created_at',
+                    'updated_at',
+                    'user_id',
+                    'efficiency',
+                    'latency',
+                    'rem_sleep',
+                    'restfulness',
+                    'timing',
+                }
+            )
+            for sleep in await SleepMeasure.filter(user__name=user['name']).prefetch_related('user')
+        ]
+        readiness_out = [
+            (await readiness_measure_dto.from_tortoise_orm(measure)).model_dump(
+                exclude={
+                    'id',
+                    'created_at',
+                    'updated_at',
+                    'user_id',
+                    'activity_balance',
+                    'body_temperature',
+                    'previous_day_activity',
+                    'previous_night',
+                    'sleep_balance',
+                }
+            )
+            for measure in await ReadinessMeasure.filter(user__name=user['name']).prefetch_related(
+                'user'
+            )
+        ]
+        data[user['name']]['sleep'] = sleep_out
+        data[user['name']]['readiness'] = readiness_out
     return data
+
+
+def format_data(data: dict[str, Any]):  # noqa
+    from oura_bot.settings import MESSAGE_FORMAT
+
+    result = ''
+    for user, user_data in data.items():
+        sleep_data = user_data['sleep']
+        readiness_data = user_data['readiness']
+        sleep = (
+            ', '.join([f'{k}: {v}' for k, v in sleep_data[0].items()]) if sleep_data else 'empty'
+        )
+        readiness = (
+            ' '.join([f'{k}: {v}' for k, v in readiness_data[0].items()])
+            if readiness_data
+            else 'empty'
+        )
+        result += MESSAGE_FORMAT.format(name=user, sleep=sleep, readiness=readiness)
+    return result
+
 
 async def pull_and_send_task() -> None:
     """Send pulled data to admin chat."""
@@ -72,16 +125,11 @@ async def pull_and_send_task() -> None:
 
     for client, user in clients:
         await get_and_save_measures_by_user(user, repository, client)
-        
+
     data = await collect_data_to_send(clients, date=datetime.now())
-
-    import json
-
-    data = json.dumps(data)
+    data = format_data(data)
     bot = container.get(Bot)
-    bot.send_message(
+    await bot.send_message(
         chat_id=os.environ.get('ADMIN_TG_CHAT_ID'),
         text=data,
     )
-
-

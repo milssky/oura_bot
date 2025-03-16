@@ -5,3 +5,9 @@ RETRY_ATTEMPTS = 5
 
 
 DELTA_TIME = timedelta(hours=5)
+
+MESSAGE_FORMAT = """{name}:
+    sleep: {sleep}
+    readiness: {readiness}
+
+"""
