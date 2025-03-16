@@ -14,7 +14,7 @@ async def run() -> None:
     scheduler = container.get(AsyncIOScheduler)
     scheduler.add_job(pull_and_send_task, IntervalTrigger(seconds=RETRY_PERIOD_SEC))
 
-    await Tortoise.init(db_url='sqlite://storage.sqlite', modules={'models': ['oura_bot.models']})
+    await Tortoise.init(db_url='sqlite://./storage.sqlite', modules={'models': ['oura_bot.models']})
     await Tortoise.generate_schemas()
 
     scheduler.start()

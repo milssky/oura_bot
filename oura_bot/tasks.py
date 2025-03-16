@@ -21,7 +21,6 @@ async def get_and_save_measures_by_user(
 ) -> Coroutine | None:
     """Save to DB user measurements."""
     if isinstance(user, dict):
-        logging.info(f'Pulling data for {user["name"]}')
         user, _ = await User.get_or_create(name=user['name'], timezone=user['timezone'])
     readiness = await repository.get_daily_readiness(client)
     sleep = await repository.get_total_sleep(client)
