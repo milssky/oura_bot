@@ -26,40 +26,18 @@ class User(IDMixin, Model):
         ordering = ('name',)
 
 
-class ReadinessMeasure(IDMixin, TimeStampedMixin, Model):
-    user = ForeignKeyField(
-        model_name='models.User',
-        related_name='readiness_measures',
-        on_delete=fields.CASCADE,
-    )
-    activity_balance = fields.IntField(null=True)
-    body_temperature = fields.IntField(null=True)
-    hrv_balance = fields.IntField(null=True)
-    previous_day_activity = fields.IntField(null=True)
-    previous_night = fields.IntField(null=True)
-    recovery_index = fields.IntField(null=True)
-    resting_heart_rate = fields.IntField(null=True)
-    sleep_balance = fields.IntField(null=True)
-
-    class Meta:
-        ordering = ('-created_at',)
-
-
 class SleepMeasure(IDMixin, TimeStampedMixin, Model):
     user = ForeignKeyField(
         model_name='models.User',
         related_name='sleep_measures',
         on_delete=fields.CASCADE,
     )
-    deep_sleep = fields.IntField(null=True)
-    efficiency = fields.IntField(null=True)
-    latency = fields.IntField(null=True)
-    rem_sleep = fields.IntField(null=True)
-    restfulness = fields.IntField(null=True)
-    timing = fields.IntField(null=True)
-    total_sleep = fields.IntField(null=True)
-    created_at = fields.DatetimeField(auto_now_add=True)
-    updated_at = fields.DatetimeField(auto_now=True)
+    deep_sleep_duration = fields.IntField()
+    total_sleep_duration = fields.IntField()
+    average_hrv = fields.FloatField()
+    average_heart_rate = fields.FloatField()
+    score = fields.IntField()
+    recovery_index= fields.IntField()
 
     class Meta:
         ordering = ('-created_at',)

@@ -15,6 +15,7 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "datamodel-code-generator>=0.28.5",
     "pre-commit>=4.1.0",
     "ruff>=0.9.10",
 ]
