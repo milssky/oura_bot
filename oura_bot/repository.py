@@ -17,12 +17,9 @@ class UserMeasureRepository:
     """Repo for Measures and users."""
 
     async def create_user_measure(self, *, measure: SleepData, user: User) -> SleepMeasure | None:
-        if measure.data == []:
+        if not measure.data:
             return None
-        data = measure.data
-        if len(data) == 0:
-            return None
-        data = data[0]
+        data = measure.data[0]
         return await SleepMeasure.create(
             user=user,
             deep_sleep_duration=data.deep_sleep_duration,
