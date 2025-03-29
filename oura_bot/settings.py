@@ -7,7 +7,7 @@ RETRY_ATTEMPTS = 1
 
 DELTA_TIME = timedelta(hours=5)
 
-MESSAGE_FORMAT = """{name}:
+MESSAGE_FORMAT = """#{name}:
     sleep: {total_sleep} ({sleep_diff})
     deep_s: {deep_s} ({deep_diff})
     score: {score} ({score_diff})

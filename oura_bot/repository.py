@@ -77,6 +77,13 @@ class UserMeasureRepository:
         diff = await self.get_diff_measure_by_user(user=user)
         return self._convert_data(measure=measure, diff=diff, name=user.name)
 
+    async def get_data_to_bot(self) -> str:
+        output_data = []
+        for user in await User.all():
+            measure = await self.get_user_measure_with_diff(user=user)
+            output_data.append(measure if measure is not None else '')
+        return ''.join(output_data)
+
     def _convert_data(self, measure: SleepMeasure, diff: DiffMeasure, name: str) -> str:
         return MESSAGE_FORMAT.format(
             name=name,

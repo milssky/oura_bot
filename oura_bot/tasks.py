@@ -29,16 +29,13 @@ async def get_and_save_measures_by_user(
 
 async def send_all_data_task() -> None:
     """Collect and send all data to tg admin."""
-    users = await User.all()
+    await User.all()
     user_repo = container.get(UserMeasureRepository)
-    output_data = []
-    for user in users:
-        measure = await user_repo.get_user_measure_with_diff(user=user)
-        output_data.append(measure if measure is not None else '')
+    output_data = await user_repo.get_data_to_bot()
     bot = container.get(Bot)
     await bot.send_message(
         chat_id=os.environ.get('ADMIN_TG_CHAT_ID'),
-        text=''.join(output_data),
+        text=output_data,
     )
 
 
