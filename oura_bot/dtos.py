@@ -42,7 +42,7 @@ class Datum(BaseModel):
     day: str | None
     deep_sleep_duration: int | None
     efficiency: int | None
-    heart_rate: HeartRate  | None
+    heart_rate: HeartRate | None
     hrv: Hrv | None
     latency: int | None
     light_sleep_duration: int | None
@@ -65,3 +65,12 @@ class Datum(BaseModel):
 class SleepData(BaseModel):
     data: list[Datum]
     next_token: str | None
+
+
+class DiffMeasure(BaseModel):
+    deep_sleep: int | None
+    total_sleep: int | None
+    average_hrv: int | None
+    average_heart_rate: int | None
+    score: int | None
+    recovery_index: int | None
