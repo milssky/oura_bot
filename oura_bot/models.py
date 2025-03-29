@@ -37,7 +37,7 @@ class SleepMeasure(IDMixin, TimeStampedMixin, Model):
     average_hrv = fields.FloatField()
     average_heart_rate = fields.FloatField()
     score = fields.IntField()
-    recovery_index= fields.IntField()
+    recovery_index = fields.IntField()
 
     class Meta:
         ordering = ('-created_at',)

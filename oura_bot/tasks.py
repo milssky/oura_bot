@@ -1,6 +1,5 @@
 import logging
 import os
-from typing import Coroutine
 
 from telegram import Bot
 
@@ -16,7 +15,7 @@ logging.basicConfig(level=logging.INFO)
 async def get_and_save_measures_by_user(
     user_data: dict[str, str],
     client: OuraClient,
-) -> Coroutine | None:
+) -> None:
     """Save to DB user measurements."""
     user_repo = container.get(UserMeasureRepository)
     user = await user_repo.get_user(user_data=user_data)
