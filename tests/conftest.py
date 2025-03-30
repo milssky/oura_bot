@@ -14,7 +14,10 @@ def mock_response_factory():
     def factory(status_code=200, json_data=None, content=None):
         stream = AsyncMock(spec=AsyncByteStream)
         response = Response(
-            status_code=status_code, json=json_data, content=content, request=AsyncMock()
+            status_code=status_code,
+            json=json_data,
+            content=content,
+            request=AsyncMock(),
         )
         response._stream = stream
         return response
@@ -38,7 +41,9 @@ async def oura_client(mock_response_factory):
 
 @pytest.fixture(scope='session', autouse=True)
 async def initialize_tests():
-    await Tortoise.init(db_url='sqlite://:memory:', modules={'models': ['oura_bot.models']})
+    await Tortoise.init(
+        db_url='sqlite://:memory:', modules={'models': ['oura_bot.models']}
+    )
     await Tortoise.generate_schemas()
     yield
     await Tortoise.close_connections()

@@ -16,7 +16,9 @@ class OuraRepository:
 class UserMeasureRepository:
     """Repo for Measures and users."""
 
-    async def create_user_measure(self, *, measure: SleepData, user: User) -> SleepMeasure | None:
+    async def create_user_measure(
+        self, *, measure: SleepData, user: User
+    ) -> SleepMeasure | None:
         if not measure.data:
             return None
         data = measure.data[0]
@@ -55,10 +57,16 @@ class UserMeasureRepository:
             pre_last = last
         else:
             pre_last = (await SleepMeasure.filter(user=user))[-2]
-        deep_sleep_diff = last.deep_sleep_duration - pre_last.deep_sleep_duration
-        total_sleep_diff = last.total_sleep_duration - pre_last.total_sleep_duration
+        deep_sleep_diff = (
+            last.deep_sleep_duration - pre_last.deep_sleep_duration
+        )
+        total_sleep_diff = (
+            last.total_sleep_duration - pre_last.total_sleep_duration
+        )
         average_hrv_diff = last.average_hrv - pre_last.average_hrv
-        average_heart_rate_diff = last.average_heart_rate - pre_last.average_heart_rate
+        average_heart_rate_diff = (
+            last.average_heart_rate - pre_last.average_heart_rate
+        )
         score_diff = last.score - pre_last.score
         recovery_index_diff = last.recovery_index - pre_last.recovery_index
         return DiffMeasure(

@@ -25,7 +25,8 @@ def schedule_user_get_and_save(
         scheduler.add_job(
             get_and_save_measures_by_user,
             kwargs={'user_data': user_data, 'client': client},
-            run_date=datetime.now(tz=ZoneInfo(user.timezone)) + timedelta(hours=1),
+            run_date=datetime.now(tz=ZoneInfo(user.timezone))
+            + timedelta(hours=1),
         )
 
 
@@ -39,9 +40,13 @@ async def get_and_save_measures_by_user(
     logging.info(f'Pulling for {user.name}')
     oura_repo = container.get(OuraRepository)
     measure = await oura_repo.get_total_sleep(user_client=client)
-    user_measure = await user_repo.create_user_measure(measure=measure, user=user)
+    user_measure = await user_repo.create_user_measure(
+        measure=measure, user=user
+    )
     if user_measure is None:
-        schedule_user_get_and_save(user=user, user_data=user_data, client=client)
+        schedule_user_get_and_save(
+            user=user, user_data=user_data, client=client
+        )
         return
     await send_user_data_task(user=user)
 

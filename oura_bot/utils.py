@@ -6,7 +6,9 @@ from oura_bot.models import SleepMeasure
 from oura_bot.settings import BASE_DIR, MESSAGE_FORMAT
 
 
-def load_users(data_path: Path = BASE_DIR / 'users.toml') -> list[dict[str, str]]:
+def load_users(
+    data_path: Path = BASE_DIR / 'users.toml',
+) -> list[dict[str, str]]:
     """Get user data from TOML users file."""
     with open(data_path, 'rb') as f:
         users = tomllib.load(f)

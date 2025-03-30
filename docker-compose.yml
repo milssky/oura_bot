@@ -1,0 +1,29 @@
+services:
+  db:
+    image: postgres:16
+    restart: always
+    volumes:
+      - db_data:/var/lib/postgresql/data/
+    ports:
+      - "5435:5432"
+    env_file:
+      - .env
+    networks:
+    - proxy-network
+
+  app:
+    build:
+      context: .
+    env_file:
+      - .env
+    networks:
+      - proxy-network
+    depends_on:
+      - db
+    restart: always
+
+networks:
+  proxy-network:
+
+volumes:
+  db_data:

@@ -15,7 +15,9 @@ async def test_user_get_or_create(repo: UserMeasureRepository) -> None:
     assert user.id == expecter_user.id
 
 
-async def test_get_last_measure(user: User, repo: UserMeasureRepository) -> None:
+async def test_get_last_measure(
+    user: User, repo: UserMeasureRepository
+) -> None:
     measure = await SleepMeasure.create(
         user=user,
         deep_sleep_duration=3000,
@@ -35,7 +37,9 @@ async def test_get_last_measure(user: User, repo: UserMeasureRepository) -> None
     assert received.recovery_index == received.recovery_index
 
 
-async def test_get_diff_measure(user: User, repo: UserMeasureRepository) -> None:
+async def test_get_diff_measure(
+    user: User, repo: UserMeasureRepository
+) -> None:
     last_measure = await SleepMeasure.create(
         user=user,
         deep_sleep_duration=3000,
