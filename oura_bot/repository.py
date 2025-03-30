@@ -1,7 +1,7 @@
 from oura_bot.client import OuraClient
 from oura_bot.dtos import DiffMeasure, SleepData
 from oura_bot.models import SleepMeasure, User
-from oura_bot.settings import MESSAGE_FORMAT
+from oura_bot.utils import convert_data
 
 
 class OuraRepository:
@@ -54,7 +54,7 @@ class UserMeasureRepository:
         if await SleepMeasure.filter(user=user).count() <= 1:
             pre_last = last
         else:
-            pre_last = (await SleepMeasure.filter(user=user))[-1]
+            pre_last = (await SleepMeasure.filter(user=user))[-2]
         deep_sleep_diff = last.deep_sleep_duration - pre_last.deep_sleep_duration
         total_sleep_diff = last.total_sleep_duration - pre_last.total_sleep_duration
         average_hrv_diff = last.average_hrv - pre_last.average_hrv
@@ -75,28 +75,4 @@ class UserMeasureRepository:
         if measure is None:
             return None
         diff = await self.get_diff_measure_by_user(user=user)
-        return self._convert_data(measure=measure, diff=diff, name=user.name)
-
-    async def get_data_to_bot(self) -> str:
-        output_data = []
-        for user in await User.all():
-            measure = await self.get_user_measure_with_diff(user=user)
-            output_data.append(measure if measure is not None else '')
-        return ''.join(output_data)
-
-    def _convert_data(self, measure: SleepMeasure, diff: DiffMeasure, name: str) -> str:
-        return MESSAGE_FORMAT.format(
-            name=name,
-            total_sleep=measure.total_sleep_duration,
-            sleep_diff=diff.total_sleep,
-            deep_s=measure.deep_sleep_duration,
-            deep_diff=diff.deep_sleep,
-            score=measure.score,
-            score_diff=diff.score,
-            average_hrv=measure.average_hrv,
-            average_hrv_diff=diff.average_hrv,
-            average_hr=measure.average_heart_rate,
-            average_hr_diff=diff.average_heart_rate,
-            recovery=measure.recovery_index,
-            recovery_diff=diff.recovery_index,
-        )
+        return convert_data(measure=measure, diff=diff, name=user.name)

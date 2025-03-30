@@ -8,6 +8,8 @@ dependencies = [
     "dishka>=1.4.2",
     "httpx>=0.28.1",
     "pydantic>=2.10.6",
+    "pytest>=8.3.5",
+    "pytest-asyncio>=0.26.0",
     "python-telegram-bot>=21.11.1",
     "stamina>=24.3.0",
     "tortoise-orm>=0.24.2",
@@ -57,3 +59,18 @@ line-ending = "auto"
 [tool.ruff.lint.extend-per-file-ignores]
 "oura_bot/dtos.py" = ["D"]
 "oura_bot/models.py" = ["D"]
+"tests/*.py" = ["S101", "S106", "D", "ANN",]
+
+
+[tool.pytest.ini_options]
+pythonpath = [
+  "oura_bot"
+]
+testpaths = ["tests"]
+python_files = "test_*.py"
+asyncio_default_fixture_loop_scope = "session"
+asyncio_mode = "auto"
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::UserWarning"
+]

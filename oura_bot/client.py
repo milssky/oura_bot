@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import Any
 
 from httpx import AsyncClient, HTTPError, Response
@@ -6,7 +5,7 @@ from stamina import retry
 
 from oura_bot.auth import BearerAuth
 from oura_bot.settings import RETRY_ATTEMPTS
-from oura_bot.urls import API_ROOT, DAILY_READINESS, TOTAL_SLEEP_URL
+from oura_bot.urls import API_ROOT, TOTAL_SLEEP_URL
 
 
 class OuraClient(AsyncClient):
@@ -22,16 +21,6 @@ class OuraClient(AsyncClient):
         response = await self.get(
             url=TOTAL_SLEEP_URL,
             auth=self.auth,
-        )
-        response.raise_for_status()
-        return response.json()
-
-    @retry(on=HTTPError, attempts=RETRY_ATTEMPTS)
-    async def get_daily_readiness(self, start_date: datetime, end_date: datetime) -> Response:
-        response = await self.get(
-            url=DAILY_READINESS,
-            auth=self.auth,
-            params=dict(start_date=str(start_date), end_date=str(end_date)),
         )
         response.raise_for_status()
         return response.json()
