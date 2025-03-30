@@ -21,6 +21,7 @@ def schedule_user_get_and_save(
 ) -> None:
     """Schedule new pull task by user after one hour."""
     if datetime.now(tz=ZoneInfo(user.timezone)).hour < RETRY_FINISH_HOUR:
+        logging.info(f'Planning retry for {user.name}')
         scheduler = container.get(AsyncIOScheduler)
         scheduler.add_job(
             get_and_save_measures_by_user,
@@ -53,6 +54,7 @@ async def get_and_save_measures_by_user(
 
 async def send_user_data_task(user: User) -> None:
     """Collect and send all data to tg admin."""
+    logging.info(f'Sending {user.name} data.')
     user_repo = container.get(UserMeasureRepository)
     output_data = await user_repo.get_user_measure_with_diff(user=user)
     bot = container.get(Bot)
