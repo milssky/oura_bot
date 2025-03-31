@@ -2,7 +2,7 @@ import os
 from datetime import time, timedelta
 from pathlib import Path
 
-RETRY_PERIOD_DAYS = 1
+RETRY_PERIOD_DAYS = 5
 RETRY_ATTEMPTS = 1
 
 

@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, field_validator
 
 
 class HeartRate(BaseModel):
@@ -35,7 +35,7 @@ class Datum(BaseModel):
     id: str
     average_breath: float | None
     average_heart_rate: float | None
-    average_hrv: int | None
+    average_hrv: int = Field(default=0)
     awake_time: int | None
     bedtime_end: str | None
     bedtime_start: str | None
@@ -60,6 +60,13 @@ class Datum(BaseModel):
     time_in_bed: int | None
     total_sleep_duration: int | None
     type: str | None
+
+    @field_validator('average_hrv', mode='before')
+    @classmethod
+    def replace_none_with_zero(cls, value: int | None) -> int:
+        if value is None:
+            return 0
+        return value
 
 
 class SleepData(BaseModel):
