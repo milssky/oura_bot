@@ -24,7 +24,7 @@ async def run() -> None:
     scheduler.add_job(
         pull_and_send_task,
         IntervalTrigger(
-            seconds=RETRY_PERIOD_DAYS,
+            days=RETRY_PERIOD_DAYS,
             start_date=datetime(
                 2025, 3, 31, 9, 0, 0, tzinfo=ZoneInfo('Europe/Moscow')
             ),
