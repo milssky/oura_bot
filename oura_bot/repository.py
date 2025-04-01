@@ -1,7 +1,12 @@
+import logging
+
 from oura_bot.client import OuraClient
 from oura_bot.dtos import DiffMeasure, SleepData
 from oura_bot.models import SleepMeasure, User
 from oura_bot.utils import convert_data
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 
 class OuraRepository:
@@ -10,6 +15,7 @@ class OuraRepository:
     async def get_total_sleep(self, *, user_client: OuraClient) -> SleepData:
         """Call sleep user api."""
         json_data = await user_client.get_total_sleep()
+        logger.debug(json_data)
         return SleepData(**json_data)
 
 
@@ -22,6 +28,7 @@ class UserMeasureRepository:
         if not measure.data:
             return None
         data = measure.data[0]
+        logger.debug(data)
         return await SleepMeasure.create(
             user=user,
             deep_sleep_duration=data.deep_sleep_duration,
@@ -44,6 +51,10 @@ class UserMeasureRepository:
 
     async def get_diff_measure_by_user(self, *, user: User) -> DiffMeasure:
         last = await self.get_user_last_measure(user=user)
+        logger.debug('---- diff ----')
+        logger.debug(user.name)
+        logger.debug('last measure')
+        logger.debug(last)
         if last is None:
             return DiffMeasure(
                 deep_sleep=0,
@@ -57,6 +68,8 @@ class UserMeasureRepository:
             pre_last = last
         else:
             pre_last = (await SleepMeasure.filter(user=user))[-2]
+        logger.debug('pre_last measure')
+        logger.debug(pre_last)
         deep_sleep_diff = (
             last.deep_sleep_duration - pre_last.deep_sleep_duration
         )
@@ -69,6 +82,7 @@ class UserMeasureRepository:
         )
         score_diff = last.score - pre_last.score
         recovery_index_diff = last.recovery_index - pre_last.recovery_index
+        logger.debug('---- /diff ----')
         return DiffMeasure(
             deep_sleep=deep_sleep_diff,
             total_sleep=total_sleep_diff,
@@ -83,4 +97,7 @@ class UserMeasureRepository:
         if measure is None:
             return None
         diff = await self.get_diff_measure_by_user(user=user)
+        logger.debug('---- calculated diff ----')
+        logger.debug(diff)
+        logger.debug('---- /calculated diff ----')
         return convert_data(measure=measure, diff=diff, name=user.name)
