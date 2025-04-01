@@ -32,10 +32,10 @@ class SleepMeasure(IDMixin, TimeStampedMixin, Model):
         related_name='sleep_measures',
         on_delete=fields.CASCADE,
     )
-    deep_sleep_duration = fields.IntField()
-    total_sleep_duration = fields.IntField()
-    average_hrv = fields.FloatField()
-    average_heart_rate = fields.FloatField()
+    deep_sleep_duration = fields.IntField(null=True)
+    total_sleep_duration = fields.IntField(null=True)
+    average_hrv = fields.FloatField(null=True)
+    average_heart_rate = fields.FloatField(null=True)
     score = fields.IntField()
     recovery_index = fields.IntField()
 
