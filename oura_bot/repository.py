@@ -27,7 +27,7 @@ class UserMeasureRepository:
     ) -> SleepMeasure | None:
         if not measure.data:
             return None
-        data = measure.data[0]
+        data = measure.data[-1]  # last measure by day
         logger.debug(data)
         return await SleepMeasure.create(
             user=user,
