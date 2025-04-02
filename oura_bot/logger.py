@@ -1,5 +1,6 @@
 import logging
 import sys
+from logging.handlers import RotatingFileHandler
 
 
 def setup_root_logger() -> None:
@@ -9,6 +10,6 @@ def setup_root_logger() -> None:
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
         handlers=[
             logging.StreamHandler(sys.stdout),
-            logging.FileHandler('app.log'),
+            RotatingFileHandler('app.log', maxBytes=1000000, backupCount=5),
         ],
     )
