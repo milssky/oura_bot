@@ -26,7 +26,7 @@ async def run() -> None:
         IntervalTrigger(
             days=RETRY_PERIOD_DAYS,
             start_date=datetime(
-                2025, 3, 31, 9, 0, 0, tzinfo=ZoneInfo('Europe/Moscow')
+                2025, 3, 31, 10, 0, 0, tzinfo=ZoneInfo('Europe/Moscow')
             ),
         ),
     )
