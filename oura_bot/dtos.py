@@ -77,7 +77,7 @@ class SleepData(BaseModel):
 class DiffMeasure(BaseModel):
     deep_sleep: int | None
     total_sleep: int | None
-    average_hrv: int | None
-    average_heart_rate: int | None
+    average_hrv: float | None
+    average_heart_rate: float | None
     score: int | None
     recovery_index: int | None
