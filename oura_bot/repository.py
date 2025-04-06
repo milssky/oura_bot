@@ -1,7 +1,8 @@
 import logging
+from datetime import datetime
 
 from oura_bot.client import OuraClient
-from oura_bot.dtos import DiffMeasure, SleepData
+from oura_bot.dtos import Datum, DiffMeasure, SleepData
 from oura_bot.models import SleepMeasure, User
 from oura_bot.utils import convert_data
 
@@ -27,7 +28,7 @@ class UserMeasureRepository:
     ) -> SleepMeasure | None:
         if not measure.data:
             return None
-        data = measure.data[-1]  # last measure by day
+        data = self.get_night_sleep_data(sleep_data=measure.data)
         logger.debug(data)
         return await SleepMeasure.create(
             user=user,
@@ -101,3 +102,10 @@ class UserMeasureRepository:
         logger.debug(diff)
         logger.debug('---- /calculated diff ----')
         return convert_data(measure=measure, diff=diff, name=user.name)
+
+    def get_night_sleep_data(self, sleep_data: list[Datum]) -> Datum:
+        return max(
+            sleep_data,
+            key=lambda m: datetime.fromisoformat(m.bedtime_end)
+            - datetime.fromisoformat(m.bedtime_start),
+        )

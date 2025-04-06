@@ -1,3 +1,4 @@
+import json
 from unittest.mock import AsyncMock
 
 import pytest
@@ -5,6 +6,7 @@ from httpx import AsyncByteStream, Response
 from tortoise import Tortoise
 
 from oura_bot.client import OuraClient
+from oura_bot.dtos import Datum
 from oura_bot.models import User
 from oura_bot.repository import UserMeasureRepository
 
@@ -60,3 +62,10 @@ async def user():
 @pytest.fixture
 def repo():
     return UserMeasureRepository()
+
+
+@pytest.fixture(scope='module')
+def sleep_data():
+    with open('tests/fixtures/sleep_data.json', 'r') as f:
+        json_data = json.load(f)
+        return [Datum(**data) for data in json_data]

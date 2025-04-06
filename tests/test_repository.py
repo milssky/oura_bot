@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from oura_bot.dtos import DiffMeasure
+from oura_bot.dtos import Datum, DiffMeasure
 from oura_bot.models import SleepMeasure, User
 from oura_bot.repository import UserMeasureRepository
 
@@ -71,3 +71,23 @@ async def test_get_diff_measure(
     assert diff.average_hrv == 4
     assert diff.average_heart_rate == 5
     assert diff.recovery_index == 10
+
+
+def test_get_night_measure(
+    sleep_data: list[Datum], repo: UserMeasureRepository
+) -> None:
+    assert len(sleep_data) == 3
+    expected_id = 'da1a32bc-054b-40cd-9c3b-ee2918dd97bb'
+    night_measure = repo.get_night_sleep_data(sleep_data=sleep_data)
+    assert night_measure.id == expected_id
+
+
+def test_get_night_measure_if_one_measure_available(
+    sleep_data: list[Datum], repo: UserMeasureRepository
+) -> None:
+    assert len(sleep_data) == 3
+    sleep_data = sleep_data[2:]
+    assert len(sleep_data) == 1
+    expected_id = 'da1a32bc-054b-40cd-9c3b-ee2918dd97bb'
+    night_measure = repo.get_night_sleep_data(sleep_data=sleep_data)
+    assert night_measure.id == expected_id
