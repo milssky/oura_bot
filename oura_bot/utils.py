@@ -1,4 +1,5 @@
 import tomllib
+from datetime import timedelta
 from pathlib import Path
 
 from oura_bot.dtos import DiffMeasure
@@ -18,13 +19,18 @@ def load_users(
     return users['users']
 
 
+def second_to_hms(seconds: int) -> str:
+    """Convert seconds to HMS."""
+    return str(timedelta(seconds=seconds))
+
+
 def convert_data(measure: SleepMeasure, diff: DiffMeasure, name: str) -> str:
     """Convert user data to str to send."""
     return MESSAGE_FORMAT.format(
         name=name,
-        total_sleep=measure.total_sleep_duration,
+        total_sleep=second_to_hms(measure.total_sleep_duration),
         sleep_diff=diff.total_sleep,
-        deep_s=measure.deep_sleep_duration,
+        deep_s=second_to_hms(measure.deep_sleep_duration),
         deep_diff=diff.deep_sleep,
         score=measure.score,
         score_diff=diff.score,
