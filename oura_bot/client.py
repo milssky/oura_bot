@@ -1,3 +1,4 @@
+from datetime import date
 from typing import Any
 
 from httpx import AsyncClient, HTTPError, Response
@@ -20,9 +21,11 @@ class OuraClient(AsyncClient):
 
     @retry(on=HTTPError, attempts=RETRY_ATTEMPTS)
     async def get_total_sleep(self) -> Response:
+        today = str(date.today())
         response = await self.get(
             url=TOTAL_SLEEP_URL,
             auth=self.auth,
+            params={'start_date': today, 'end_date': today},
         )
         response.raise_for_status()
         return response.json()
