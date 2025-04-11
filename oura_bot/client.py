@@ -1,3 +1,4 @@
+import logging
 from datetime import date
 from typing import Any
 
@@ -22,6 +23,7 @@ class OuraClient(AsyncClient):
     @retry(on=HTTPError, attempts=RETRY_ATTEMPTS)
     async def get_total_sleep(self) -> Response:
         today = str(date.today())
+        logging.debug(f'Today date is {today}')
         response = await self.get(
             url=TOTAL_SLEEP_URL,
             auth=self.auth,
