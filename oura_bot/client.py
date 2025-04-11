@@ -1,5 +1,5 @@
 import logging
-from datetime import date
+from datetime import date, timedelta
 from typing import Any
 
 from httpx import AsyncClient, HTTPError, Response
@@ -22,12 +22,13 @@ class OuraClient(AsyncClient):
 
     @retry(on=HTTPError, attempts=RETRY_ATTEMPTS)
     async def get_total_sleep(self) -> Response:
-        today = str(date.today())
-        logging.debug(f'Today date is {today}')
+        start_date = str(date.today() - timedelta(days=1))
+        end_date = str(date.today())
+        logging.debug(f'Today date is {end_date}')
         response = await self.get(
             url=TOTAL_SLEEP_URL,
             auth=self.auth,
-            params={'start_date': today, 'end_date': today},
+            params={'start_date': start_date, 'end_date': end_date},
         )
         response.raise_for_status()
         return response.json()
