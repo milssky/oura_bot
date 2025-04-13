@@ -106,6 +106,6 @@ class UserMeasureRepository:
     def get_night_sleep_data(self, sleep_data: list[Datum]) -> Datum:
         return max(
             sleep_data,
-            key=lambda m: datetime.fromisoformat(m.bedtime_end)
-            - datetime.fromisoformat(m.bedtime_start),
+            key=lambda measure: datetime.fromisoformat(measure.bedtime_end)
+            - datetime.fromisoformat(measure.bedtime_start),
         )
