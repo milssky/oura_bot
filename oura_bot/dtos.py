@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, RootModel, field_validator
 
 
 class HeartRate(BaseModel):
@@ -81,3 +81,27 @@ class DiffMeasure(BaseModel):
     average_heart_rate: float | None
     score: int | None
     recovery_index: int | None
+
+
+class TrainingPeakMeasureDetail(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
+    timestamp: str = Field(alias='timeStamp')
+    value: float
+    mean: float | None
+    range_high: float | None = Field(alias='rangeHigh')
+    range_low: float | None = Field(alias='rangeLow')
+
+
+class TrainingPeakMeasure(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
+    athlete_id: int = Field(alias='athleteId')
+    label: str
+    type: int
+    upload_client: str = Field(alias='uploadClient')
+    details: list[TrainingPeakMeasureDetail]
+
+
+class TrainingPeakMeasures(RootModel):
+    root: list[TrainingPeakMeasure]
