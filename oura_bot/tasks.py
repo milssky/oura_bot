@@ -6,10 +6,14 @@ from zoneinfo import ZoneInfo
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from telegram import Bot
 
-from oura_bot.client import OuraClient
-from oura_bot.models import User
+from oura_bot.client import OuraClient, TrainingPeaksClient
+from oura_bot.models import TrainingPeaksUser, User
 from oura_bot.provider import container
-from oura_bot.repository import OuraRepository, UserMeasureRepository
+from oura_bot.repository import (
+    OuraRepository,
+    TPRepository,
+    UserMeasureRepository,
+)
 from oura_bot.settings import RETRY_FINISH_HOUR
 from oura_bot.utils import load_users
 
@@ -66,10 +70,54 @@ async def send_user_data_task(user: User) -> None:
     )
 
 
-async def pull_and_send_task() -> None:
-    """Send pulled data to admin chat."""
-    logger.info('Pulling data...')
-
+async def _pull_oura_data() -> None:
+    """Pull data from Oura for all users."""
+    logger.info('Pulling Oura data...')
     clients = [(OuraClient(token=user['token']), user) for user in load_users()]
     for client, user in clients:
         await get_and_save_measures_by_user(user, client)
+
+
+async def _pull_tp_data() -> None:
+    """Pull data from TrainingPeaks for all users."""
+    tp_repo = container.get(TPRepository)
+    tp_token = await tp_repo.get_token()
+    bot = container.get(Bot)
+    admin_chat_id = os.environ.get('ADMIN_TG_CHAT_ID')
+
+    if not tp_token:
+        logger.warning('TP token not found.')
+        await bot.send_message(
+            chat_id=admin_chat_id,
+            text='⚠️ TrainingPeaks token is missing. Please set it using /set_tp_token.',
+        )
+        return
+
+    logger.info('Pulling TrainingPeaks data...')
+    async with TrainingPeaksClient(token=tp_token) as tp_client:
+        tp_users = await TrainingPeaksUser.all()
+        for tp_user in tp_users:
+            try:
+                logger.info(f'Pulling TP data for {tp_user.name}')
+                response = await tp_client.get_measure_by_user_id(
+                    user_id=tp_user.athlete_id
+                )
+                logger.info(
+                    f'TP data for {tp_user.name}: {response.status_code}'
+                )
+            except Exception as e:
+                logger.error(f'Failed to pull TP data for {tp_user.name}: {e}')
+                await bot.send_message(
+                    chat_id=admin_chat_id,
+                    text=(
+                        f'❌ Error pulling TrainingPeaks data for {tp_user.name}.\n'
+                        'The token might be expired or invalid. Please update it using /set_tp_token.'
+                    ),
+                )
+
+
+async def pull_and_send_task() -> None:
+    """Send pulled data to admin chat."""
+    logger.info('Starting data pull task...')
+    await _pull_oura_data()
+    await _pull_tp_data()

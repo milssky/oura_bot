@@ -3,11 +3,33 @@ from datetime import datetime
 
 from oura_bot.client import OuraClient
 from oura_bot.dtos import Datum, DiffMeasure, SleepData
-from oura_bot.models import SleepMeasure, User
+from oura_bot.models import SleepMeasure, TPConfig, TrainingPeaksUser, User
 from oura_bot.utils import convert_data
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
+
+
+class TPRepository:
+    """Repo for TrainingPeaks config."""
+
+    async def update_token(self, token: str) -> None:
+        """Update or create TP token."""
+        config = await TPConfig.all().first()
+        if config:
+            config.token = token
+            await config.save()
+        else:
+            await TPConfig.create(token=token)
+
+    async def get_token(self) -> str | None:
+        """Get current TP token."""
+        config = await TPConfig.all().first()
+        return config.token if config else None
+
+    async def add_user(self, name: str, athlete_id: int) -> TrainingPeaksUser:
+        """Add a new TrainingPeaks user."""
+        return await TrainingPeaksUser.create(name=name, athlete_id=athlete_id)
 
 
 class OuraRepository:

@@ -41,3 +41,19 @@ class SleepMeasure(IDMixin, TimeStampedMixin, Model):
 
     class Meta:
         ordering = ('-created_at',)
+
+
+class TPConfig(IDMixin, TimeStampedMixin, Model):
+    token = fields.CharField(max_length=1000)
+
+    class Meta:
+        table = 'tp_config'
+
+
+class TrainingPeaksUser(IDMixin, TimeStampedMixin, Model):
+    name = fields.CharField(max_length=254)
+    athlete_id = fields.IntField()
+
+    class Meta:
+        table = 'tp_users'
+        ordering = ('name',)

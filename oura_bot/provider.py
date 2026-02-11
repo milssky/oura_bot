@@ -4,7 +4,11 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from dishka import Provider, Scope, make_container, provide
 from telegram import Bot
 
-from oura_bot.repository import OuraRepository, UserMeasureRepository
+from oura_bot.repository import (
+    OuraRepository,
+    TPRepository,
+    UserMeasureRepository,
+)
 
 
 class ServiceProvider(Provider):
@@ -25,6 +29,10 @@ class ServiceProvider(Provider):
     @provide(scope=Scope.APP)
     def get_oura_repo(self) -> OuraRepository:
         return OuraRepository()
+
+    @provide(scope=Scope.APP)
+    def get_tp_repo(self) -> TPRepository:
+        return TPRepository()
 
 
 container = make_container(ServiceProvider())

@@ -6,6 +6,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 from tortoise import Tortoise
 
+from oura_bot.bot import get_bot_app
 from oura_bot.provider import container
 from oura_bot.settings import (
     DB_HOST,
@@ -38,9 +39,18 @@ async def run() -> None:
     await Tortoise.generate_schemas()
 
     scheduler.start()
+
+    app = get_bot_app()
+    await app.initialize()
+    await app.start()
+    await app.updater.start_polling()
+
     try:
         while True:
             await asyncio.sleep(1)
     except (KeyboardInterrupt, SystemExit):
         scheduler.shutdown()
+        await app.updater.stop()
+        await app.stop()
+        await app.shutdown()
         await Tortoise.close_connections()
